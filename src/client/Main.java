@@ -8,5 +8,5 @@ import client.gui.GameSetup;
 public class Main {
     public static void main(String[] args) {
         GameSetup game = new GameSetup();
-    }
+    }// creates client game load gui and runs proccess
 }

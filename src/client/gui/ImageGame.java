@@ -14,7 +14,7 @@ import java.nio.ByteBuffer;
 /**
  * Created by Daniel on 2016/11/07.
  */
-public class ImageGame extends JFrame{
+public class ImageGame extends JFrame {
     private Socket client;
     private OutputStream rOut;
     private PrintWriter out;
@@ -25,9 +25,13 @@ public class ImageGame extends JFrame{
     private JButton guess;
     private JTextField input;
 
+    /**
+     * Intiates the client game gui
+     *
+     * @param client The socket of the client
+     */
     public ImageGame(Socket client) {
-        try
-        {
+        try {
             setTitle("Eye Spy");
             this.client = client;
             rIn = new BufferedInputStream(client.getInputStream());
@@ -39,44 +43,44 @@ public class ImageGame extends JFrame{
             input = new JTextField("Enter Guess Here");
             add(points, BorderLayout.NORTH);
             add(input, BorderLayout.WEST);
-            add(guess, BorderLayout.EAST);
+            add(guess, BorderLayout.EAST);//these are very ugly but im not a visual designer. As the guys at entelect say front end is not visual
             this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             this.setLocationRelativeTo(null);
             this.setSize(400, 250);
-            int width = this.getWidth()/2;
-            int height = this.getHeight()/2;
-            int x = (Toolkit.getDefaultToolkit().getScreenSize().width/2)-width;
-            int y = (Toolkit.getDefaultToolkit().getScreenSize().height/2)-height;
+            int width = this.getWidth() / 2;
+            int height = this.getHeight() / 2;
+            int x = (Toolkit.getDefaultToolkit().getScreenSize().width / 2) - width;
+            int y = (Toolkit.getDefaultToolkit().getScreenSize().height / 2) - height;//works out center of screen
             this.setLocation(x, y);
             this.setVisible(true);
             gameHandler();
-        }catch (SocketException e) {
-            JOptionPane.showMessageDialog(this, "Server connection lost");
-        } catch(IOException e)
-        {
+        } catch (SocketException e) {
+            JOptionPane.showMessageDialog(this, "Server connection lost");//incase the server disconnects
+        } catch (IOException e) {
 
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Handles server requests and sends responses
+     *
+     * @throws IOException            yeah shit happens
+     * @throws ClassNotFoundException incase i lose the classes
+     */
     private void gameHandler() throws IOException, ClassNotFoundException {
         boolean resign = false;
         String line;
 
-        while(!resign)
-        {
+        while (!resign) {
             line = in.readLine();
-            if (line.equals("YOUR TURN"))
-            {
+            if (line.equals("YOUR TURN")) {
                 setUserWait(true);
-                while(waitForUser)
-                {
-                    guess.addActionListener(new ActionListener(){
-                        public void actionPerformed(ActionEvent e)
-                        {
-                            if (input.getText().isEmpty())
-                            {
+                while (waitForUser) { //listens till the user has answered then ignores the button
+                    guess.addActionListener(new ActionListener() {
+                        public void actionPerformed(ActionEvent e) {
+                            if (input.getText().isEmpty()) {
                                 out.println("SEND ANSWER");
                                 out.flush();
                                 out.println(input.getText());
@@ -85,54 +89,56 @@ public class ImageGame extends JFrame{
                         }
                     });
                 }
-            } else if (line.equals("SEND IMAGE"))
+            } else if (line.equals("SEND IMAGE")) //Gets the image from the server
             {
                 BufferedImage image = getImage();
                 JDialog dialog = new JDialog();
-                if (image instanceof Image)
-                {
-                    ImageIcon icon = new ImageIcon((Image)image);
+                if (image instanceof Image) {
+                    ImageIcon icon = new ImageIcon((Image) image);
                     JLabel label = new JLabel(icon);
                     dialog.add(label);
                     dialog.pack();
-                    dialog.setVisible(true);
+                    dialog.setVisible(true);//displays it in a nice frame seperately
                 }
-            } else if (line.equals("GET IMAGE"))
-            {
+            } else if (line.equals("GET IMAGE")) {
                 final JFileChooser fc = new JFileChooser();
-                int returnVal = fc.showOpenDialog(ImageGame.this);
-                if (returnVal == JFileChooser.APPROVE_OPTION)
-                {
+                int returnVal = fc.showOpenDialog(ImageGame.this);//prompts user for the picture he wants to send
+                if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File file = fc.getSelectedFile();
                     sendImage(file);
                 }
-            } else if (line.equals("SEND QUESTION"))
-            {
-                out.println(JOptionPane.showInputDialog("What object must the user guess"));
+            } else if (line.equals("SEND QUESTION")) {
+                out.println(JOptionPane.showInputDialog("What object must the user guess"));//asks the client what object his opponent must guess
                 out.flush();
-            }else if (line.equals("POINTS"))
-            {
+            } else if (line.equals("POINTS")) {
                 String[] ts = in.readLine().split("\\s");
-                points.setText("You: " + ts[0] + "\tOpp: " + ts[1]);
-            }else if (line.equals("YOU LOSE"))
-            {
+                points.setText("You: " + ts[0] + "\tOpp: " + ts[1]);//displays current points
+            } else if (line.equals("YOU LOSE")) {
                 JOptionPane.showMessageDialog(this, "You lost");
-                System.exit(1);
-            }else if (line.equals("YOU WIN"))
-            {
+                System.exit(1);//close the game cause its over
+            } else if (line.equals("YOU WIN")) {
                 JOptionPane.showMessageDialog(this, "You Won");
-                System.exit(1);
+                System.exit(1);//close the game cause u won and no one can touch u
             }
         }
     }
 
-    private void setUserWait(boolean v)
-    {
+    /**
+     * Has to change userWait here because it can not be referenced inside an action listener
+     *
+     * @param v the new boolean value
+     */
+    private void setUserWait(boolean v) {
         waitForUser = v;
     }
 
-    public void sendImage(File path) throws IOException
-    {
+    /**
+     * Sends the image to the client
+     *
+     * @param path BufferedImage to be sent
+     * @throws IOException if it fails
+     */
+    public void sendImage(File path) throws IOException {
         BufferedImage img = ImageIO.read(path);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ImageIO.write(img, "jpg", byteArrayOutputStream);
@@ -142,8 +148,14 @@ public class ImageGame extends JFrame{
         os.write(byteArrayOutputStream.toByteArray());
         os.flush();
     }
-    public BufferedImage getImage() throws IOException, ClassNotFoundException
-    {
+
+    /**
+     * Gets the chosen image from the client
+     *
+     * @return The receieved bufferedimage
+     * @throws IOException if it fails
+     */
+    public BufferedImage getImage() throws IOException {
         InputStream is = rIn;
         BufferedImage res = null;
         try {

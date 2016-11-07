@@ -10,8 +10,7 @@ import java.nio.ByteBuffer;
 /**
  * Created by Daniel on 2016/11/02.
  */
-public class GameNetworkHandler
-{
+public class GameNetworkHandler {
     private OutputStream rOut;
     private PrintWriter out;
     private InputStream rIn;
@@ -22,9 +21,10 @@ public class GameNetworkHandler
     private int points = 0;
 
     /**
-     * Default constructor
+     * Default constructor for the tcp handler for one of the players
      *
-     * @param ConnectionToClient Connected server socket
+     * @param ConnectionToClient Connected client socket
+     * @throws IOException when shit goes wrong like usual
      */
     public GameNetworkHandler(Socket ConnectionToClient) throws IOException {
         // Bind Streams
@@ -41,26 +41,20 @@ public class GameNetworkHandler
     }
 
     /**
-     * The code below is to fix problems with ImageIO.read not clearing all bytes of an image.
+     * Lets player know that it is their turn
      */
-    private static void clearInput(InputStream is) throws IOException {
-        int extra = is.available();
-        if (extra > 0) {
-            byte[] buffer = new byte[extra];
-            is.read(buffer);
-            System.out.println(extra + " " + new String(buffer));
-        }
-    }
-    public void notifyTurn()
-    {
+    public void notifyTurn() {
         out.println("YOUR TURN");
         out.flush();
     }
 
-
-
-    public void sendImage(BufferedImage path) throws IOException
-    {
+    /**
+     * Sends the image to the client
+     *
+     * @param path BufferedImage to be sent
+     * @throws IOException if it fails
+     */
+    public void sendImage(BufferedImage path) throws IOException {
         out.println("SEND IMAGE");
         out.flush();
         BufferedImage img = path;
@@ -72,8 +66,14 @@ public class GameNetworkHandler
         os.write(byteArrayOutputStream.toByteArray());
         os.flush();
     }
-    public BufferedImage getImage() throws IOException
-    {
+
+    /**
+     * Gets the chosen image from the client
+     *
+     * @return The receieved bufferedimage
+     * @throws IOException if it fails
+     */
+    public BufferedImage getImage() throws IOException {
         out.println("GET IMAGE");
         out.flush();
         InputStream is = rIn;
@@ -93,21 +93,31 @@ public class GameNetworkHandler
         return res;
     }
 
+    /**
+     * The answer the client
+     *
+     * @return String answer
+     */
     public String getAnswer() {
         return this.answer;
     }
 
+    /**
+     * The clients points
+     *
+     * @return int points
+     */
     public int getPoints() {
         return points;
     }
 
-    public void receiveAnswer()
-    {
-        try
-        {
+    /**
+     * Gets the answer from the client and assigns it to the answer variable
+     */
+    public void receiveAnswer() {
+        try {
             String temp = in.readLine();
-            if (temp.equals("SEND ANSWER"))
-            {
+            if (temp.equals("SEND ANSWER")) {
                 answer = in.readLine();
             }
         } catch (IOException e) {
@@ -115,11 +125,22 @@ public class GameNetworkHandler
         }
     }
 
+    /**
+     * Asks client for answer
+     *
+     * @return new answer
+     */
     public String getQuestion() {
-        receiveAnswer();
+        receiveQuestion();
         return this.question;
     }
 
+    /**
+     * Sends the points to the user
+     *
+     * @param you the clients points
+     * @param opp the opponents points
+     */
     public void sendPoints(int you, int opp) {
         out.println("POINTS");
         out.flush();
@@ -127,24 +148,34 @@ public class GameNetworkHandler
         out.flush();
     }
 
+    /**
+     * Adds 1 to the clients current points
+     */
     public void addPoint() {
         this.points++;
     }
 
+    /**
+     * Notifies the client that he has lost
+     */
     public void sendLose() {
         out.println("YOU LOSE");
         out.flush();
     }
 
+    /**
+     * Notifies client that he has won
+     */
     public void sendWin() {
         out.println("YOU WIN");
         out.flush();
     }
 
-    public void receiveQuestion()
-    {
-        try
-        {
+    /**
+     * Gets the question for the user
+     */
+    public void receiveQuestion() {
+        try {
             out.println("SEND QUESTION");
             out.flush();
             String temp = in.readLine();

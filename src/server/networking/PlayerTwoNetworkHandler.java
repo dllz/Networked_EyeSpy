@@ -8,6 +8,11 @@ import java.net.Socket;
  * This makes it a lot easier to keep track of tcp connections
  */
 public class PlayerTwoNetworkHandler extends GameNetworkHandler {
+    /**
+     * @param ConnectionToClient
+     * @throws IOException
+     * @see GameNetworkHandler
+     */
     public PlayerTwoNetworkHandler(Socket ConnectionToClient) throws IOException {
         super(ConnectionToClient);
     }
