@@ -64,8 +64,8 @@ public class GameSetup extends JFrame
                 } else if(line.equals("GAME MATCHED"))
                 {
                     waiting = false;
-                    ImageGame game = new ImageGame(connect);
                     this.setVisible(false);
+                    ImageGame game = new ImageGame(connect);
                 }
             } catch (IOException e) {
                 notice.setText("Server connection lost");

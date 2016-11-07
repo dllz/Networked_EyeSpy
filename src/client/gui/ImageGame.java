@@ -23,22 +23,32 @@ public class ImageGame extends JFrame{
     private JLabel points;
     private boolean waitForUser = true;
     private JButton guess;
-    private JTextArea input;
+    private JTextField input;
 
     public ImageGame(Socket client) {
         try
         {
+            setTitle("Eye Spy");
             this.client = client;
             rIn = new BufferedInputStream(client.getInputStream());
             rOut = client.getOutputStream();
             in = new BufferedReader(new InputStreamReader(rIn));
             out = new PrintWriter(client.getOutputStream());
-            points = new JLabel();
-            guess = new JButton();
-            input = new JTextArea();
+            points = new JLabel("You: 0    Opp: 0");
+            guess = new JButton("Send Guess");
+            input = new JTextField("Enter Guess Here");
             add(points, BorderLayout.NORTH);
             add(input, BorderLayout.WEST);
             add(guess, BorderLayout.EAST);
+            this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            this.setLocationRelativeTo(null);
+            this.setSize(400, 250);
+            int width = this.getWidth()/2;
+            int height = this.getHeight()/2;
+            int x = (Toolkit.getDefaultToolkit().getScreenSize().width/2)-width;
+            int y = (Toolkit.getDefaultToolkit().getScreenSize().height/2)-height;
+            this.setLocation(x, y);
+            this.setVisible(true);
             gameHandler();
         }catch (SocketException e) {
             JOptionPane.showMessageDialog(this, "Server connection lost");
@@ -77,7 +87,16 @@ public class ImageGame extends JFrame{
                 }
             } else if (line.equals("SEND IMAGE"))
             {
-                getImage();
+                BufferedImage image = getImage();
+                JDialog dialog = new JDialog();
+                if (image instanceof Image)
+                {
+                    ImageIcon icon = new ImageIcon((Image)image);
+                    JLabel label = new JLabel(icon);
+                    dialog.add(label);
+                    dialog.pack();
+                    dialog.setVisible(true);
+                }
             } else if (line.equals("GET IMAGE"))
             {
                 final JFileChooser fc = new JFileChooser();
