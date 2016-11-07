@@ -1,8 +1,11 @@
 package server.networking;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
+import java.nio.ByteBuffer;
 
 /**
  * Created by Daniel on 2016/11/02.
@@ -56,17 +59,34 @@ public class GameNetworkHandler
 
 
 
-    public void sendImage(BufferedImage image) throws IOException
+    public void sendImage(BufferedImage path) throws IOException
     {
-        System.out.println("Sending data" + " " + System.currentTimeMillis());
-        //TO-DO Send image code
+        BufferedImage img = path;
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ImageIO.write(img, "jpg", byteArrayOutputStream);
+        OutputStream os = rOut;
+        byte[] size = ByteBuffer.allocate(4).putInt(byteArrayOutputStream.size()).array();
+        os.write(size);
+        os.write(byteArrayOutputStream.toByteArray());
+        os.flush();
     }
-
-    public BufferedImage getImage() {
-        //TO-DO Get image
-        BufferedImage img = null;
-
-        return img;
+    public BufferedImage getImage() throws IOException, ClassNotFoundException
+    {
+        InputStream is = rIn;
+        BufferedImage res = null;
+        try {
+            byte[] sizeAr = new byte[4];
+            is.read(sizeAr);
+            int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
+            byte[] imageAr = new byte[size];
+            is.read(imageAr);
+            res = ImageIO.read(new ByteArrayInputStream(imageAr));
+        } catch (SocketException e1) {
+            e1.printStackTrace();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        return res;
     }
 
     public String getAnswer() {
