@@ -61,6 +61,8 @@ public class GameNetworkHandler
 
     public void sendImage(BufferedImage path) throws IOException
     {
+        out.println("SEND IMAGE");
+        out.flush();
         BufferedImage img = path;
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ImageIO.write(img, "jpg", byteArrayOutputStream);
@@ -70,8 +72,10 @@ public class GameNetworkHandler
         os.write(byteArrayOutputStream.toByteArray());
         os.flush();
     }
-    public BufferedImage getImage() throws IOException, ClassNotFoundException
+    public BufferedImage getImage() throws IOException
     {
+        out.println("GET IMAGE");
+        out.flush();
         InputStream is = rIn;
         BufferedImage res = null;
         try {
@@ -93,15 +97,60 @@ public class GameNetworkHandler
         return this.answer;
     }
 
-    public String getQuestion() {
-        return this.question;
-    }
-
     public int getPoints() {
         return points;
     }
 
+    public void receiveAnswer()
+    {
+        try
+        {
+            String temp = in.readLine();
+            if (temp.equals("SEND ANSWER"))
+            {
+                answer = in.readLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getQuestion() {
+        receiveAnswer();
+        return this.question;
+    }
+
+    public void sendPoints(int you, int opp) {
+        out.println("POINTS");
+        out.flush();
+        out.println(you + " " + opp);
+        out.flush();
+    }
+
     public void addPoint() {
         this.points++;
+    }
+
+    public void sendLose() {
+        out.println("YOU LOSE");
+        out.flush();
+    }
+
+    public void sendWin() {
+        out.println("YOU WIN");
+        out.flush();
+    }
+
+    public void receiveQuestion()
+    {
+        try
+        {
+            out.println("SEND QUESTION");
+            out.flush();
+            String temp = in.readLine();
+            question = temp;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

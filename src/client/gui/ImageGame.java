@@ -2,6 +2,9 @@ package client.gui;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.net.Socket;
@@ -20,6 +23,7 @@ public class ImageGame extends JFrame{
     private JLabel points;
     private boolean waitForUser = true;
     private JButton guess;
+    private JTextArea input;
 
     public ImageGame(Socket client) {
         try
@@ -29,6 +33,12 @@ public class ImageGame extends JFrame{
             rOut = client.getOutputStream();
             in = new BufferedReader(new InputStreamReader(rIn));
             out = new PrintWriter(client.getOutputStream());
+            points = new JLabel();
+            guess = new JButton();
+            input = new JTextArea();
+            add(points, BorderLayout.NORTH);
+            add(input, BorderLayout.WEST);
+            add(guess, BorderLayout.EAST);
             gameHandler();
         }catch (SocketException e) {
             JOptionPane.showMessageDialog(this, "Server connection lost");
@@ -52,16 +62,40 @@ public class ImageGame extends JFrame{
                 setUserWait(true);
                 while(waitForUser)
                 {
-
+                    guess.addActionListener(new ActionListener(){
+                        public void actionPerformed(ActionEvent e)
+                        {
+                            if (input.getText().isEmpty())
+                            {
+                                out.println("SEND ANSWER");
+                                out.flush();
+                                out.println(input.getText());
+                                setUserWait(false);
+                            }
+                        }
+                    });
                 }
-            } else if (line.equals("SEND GAME"))
+            } else if (line.equals("SEND IMAGE"))
             {
                 getImage();
-            } else if (line.equals("GET GAME"))
+            } else if (line.equals("GET IMAGE"))
             {
-                File image = null;
-                sendImage(image);
-            } else if (line.equals("YOU LOSE"))
+                final JFileChooser fc = new JFileChooser();
+                int returnVal = fc.showOpenDialog(ImageGame.this);
+                if (returnVal == JFileChooser.APPROVE_OPTION)
+                {
+                    File file = fc.getSelectedFile();
+                    sendImage(file);
+                }
+            } else if (line.equals("SEND QUESTION"))
+            {
+                out.println(JOptionPane.showInputDialog("What object must the user guess"));
+                out.flush();
+            }else if (line.equals("POINTS"))
+            {
+                String[] ts = in.readLine().split("\\s");
+                points.setText("You: " + ts[0] + "\tOpp: " + ts[1]);
+            }else if (line.equals("YOU LOSE"))
             {
                 JOptionPane.showMessageDialog(this, "You lost");
                 System.exit(1);
