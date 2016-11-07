@@ -1,6 +1,5 @@
 package server.server;
 
-import general.models.Player;
 import server.processing.GameHandler;
 
 import java.io.IOException;

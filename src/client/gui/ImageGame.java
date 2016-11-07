@@ -1,16 +1,10 @@
 package client.gui;
 
-import general.models.*;
-import server.processing.GameHandler;
-
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.LineBorder;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.*;
+import java.net.Socket;
+import java.net.SocketException;
 
 /**
  * Created by Daniel on 2016/11/07.
@@ -61,11 +55,11 @@ public class ImageGame extends JFrame{
                 }
             } else if (line.equals("SEND GAME"))
             {
-                getGame();
-                redrawBoard(player);
+                getImage();
             } else if (line.equals("GET GAME"))
             {
-                sendGame();
+                File image = null;
+                sendImage(image);
             } else if (line.equals("YOU LOSE"))
             {
                 JOptionPane.showMessageDialog(this, "You lost");
@@ -83,18 +77,16 @@ public class ImageGame extends JFrame{
         waitForUser = v;
     }
 
-    public void sendObject(Game obj) throws IOException
+    public void sendImage(File img) throws IOException
     {
         System.out.println("Sending data" + " " + System.currentTimeMillis());
 
-        dataOut.writeObject(obj);
-        dataOut.flush();
     }
-    public Game getObject() throws IOException, ClassNotFoundException
+    public BufferedImage getImage() throws IOException, ClassNotFoundException
     {
-        Game res;
-        res =  (Game) dataIn.readObject();
-        return res;
+        BufferedImage img = null;
+
+        return img;
     }
 
 }

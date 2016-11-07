@@ -1,13 +1,7 @@
 package server.networking;
 
-import general.models.Board;
-import general.models.Clock;
-import general.models.Game;
-
+import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
@@ -62,14 +56,17 @@ public class GameNetworkHandler
 
 
 
-    public void sendImage(File image) throws IOException
+    public void sendImage(BufferedImage image) throws IOException
     {
         System.out.println("Sending data" + " " + System.currentTimeMillis());
         //TO-DO Send image code
     }
 
-    public File getImage() {
+    public BufferedImage getImage() {
         //TO-DO Get image
+        BufferedImage img = null;
+
+        return img;
     }
 
     public String getAnswer() {
