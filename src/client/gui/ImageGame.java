@@ -75,12 +75,14 @@ public class ImageGame extends JFrame {
 
         while (!resign) {
             line = in.readLine();
+            System.out.println(line);
             if (line.equals("YOUR TURN")) {
                 setUserWait(true);
+                JOptionPane.showMessageDialog(this, "Please take a guess what object the other player is reffering to");
                 while (waitForUser) { //listens till the user has answered then ignores the button
                     guess.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            if (input.getText().isEmpty()) {
+                            if (!input.getText().isEmpty()) {
                                 out.println("SEND ANSWER");
                                 out.flush();
                                 out.println(input.getText());
@@ -101,10 +103,13 @@ public class ImageGame extends JFrame {
                     dialog.setVisible(true);//displays it in a nice frame seperately
                 }
             } else if (line.equals("GET IMAGE")) {
+                JOptionPane.showMessageDialog(this,"Please select an image for the other player to guess the object in");
                 final JFileChooser fc = new JFileChooser();
                 int returnVal = fc.showOpenDialog(ImageGame.this);//prompts user for the picture he wants to send
                 if (returnVal == JFileChooser.APPROVE_OPTION) {
                     File file = fc.getSelectedFile();
+                    out.println("SENDING IMAGE");
+                    out.flush();
                     sendImage(file);
                 }
             } else if (line.equals("SEND QUESTION")) {
@@ -112,7 +117,7 @@ public class ImageGame extends JFrame {
                 out.flush();
             } else if (line.equals("POINTS")) {
                 String[] ts = in.readLine().split("\\s");
-                points.setText("You: " + ts[0] + "\tOpp: " + ts[1]);//displays current points
+                points.setText("You: " + ts[0] + "    Opponent: " + ts[1]);//displays current points
             } else if (line.equals("YOU LOSE")) {
                 JOptionPane.showMessageDialog(this, "You lost");
                 System.exit(1);//close the game cause its over

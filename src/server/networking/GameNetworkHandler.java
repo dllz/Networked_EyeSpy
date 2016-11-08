@@ -78,18 +78,28 @@ public class GameNetworkHandler {
         out.flush();
         InputStream is = rIn;
         BufferedImage res = null;
-        try {
-            byte[] sizeAr = new byte[4];
-            is.read(sizeAr);
-            int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
-            byte[] imageAr = new byte[size];
-            is.read(imageAr);
-            res = ImageIO.read(new ByteArrayInputStream(imageAr));
-        } catch (SocketException e1) {
-            e1.printStackTrace();
-        } catch (IOException e1) {
-            e1.printStackTrace();
+        boolean wait = true;
+        while(wait)
+        {
+            String line = in.readLine();
+            if (line.equals("SENDING IMAGE"))
+            {
+                try {
+                    byte[] sizeAr = new byte[4];
+                    is.read(sizeAr);
+                    int size = ByteBuffer.wrap(sizeAr).asIntBuffer().get();
+                    byte[] imageAr = new byte[size];
+                    is.read(imageAr);
+                    res = ImageIO.read(new ByteArrayInputStream(imageAr));
+                    wait = false;
+                } catch (SocketException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
         }
+
         return res;
     }
 
@@ -132,7 +142,6 @@ public class GameNetworkHandler {
      * @return new answer
      */
     public String getQuestion() {
-        receiveQuestion();
         return this.question;
     }
 
