@@ -50,6 +50,7 @@ public class GameHandler implements Runnable {
                     blackPlayer.notifyTurn();
                     currentTurn = 1;
                 } catch (IOException e) {
+                    running = false;
                     e.printStackTrace();
                 }
             } else if (currentTurn == 1) {// player 2
@@ -66,10 +67,12 @@ public class GameHandler implements Runnable {
                     whitePlayer.notifyTurn();
                     currentTurn = 0;
                 } catch (IOException e) {
+                    running = false;
                     e.printStackTrace();
                 }
             }
         }
+        Thread.yield();
     }
 
     /**
