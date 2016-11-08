@@ -46,6 +46,7 @@ public class GameHandler implements Runnable {
                         checkWinner();
                     }
                     blackPlayer.sendPoints(blackPlayer.getPoints(), whitePlayer.getPoints());
+                    whitePlayer.sendPoints(whitePlayer.getPoints(), blackPlayer.getPoints());
                     blackPlayer.notifyTurn();
                     currentTurn = 1;
                 } catch (IOException e) {
@@ -54,12 +55,14 @@ public class GameHandler implements Runnable {
             } else if (currentTurn == 1) {// player 2
                 try {
                     whitePlayer.sendImage(blackPlayer.getImage());
+                    blackPlayer.receiveQuestion();
                     String answer = whitePlayer.getAnswer();
                     if (answer.equalsIgnoreCase(blackPlayer.getQuestion())) {
                         whitePlayer.addPoint();
                         checkWinner();
                     }
                     whitePlayer.sendPoints(whitePlayer.getPoints(), blackPlayer.getPoints());
+                    blackPlayer.sendPoints(blackPlayer.getPoints(), whitePlayer.getPoints());
                     whitePlayer.notifyTurn();
                     currentTurn = 0;
                 } catch (IOException e) {

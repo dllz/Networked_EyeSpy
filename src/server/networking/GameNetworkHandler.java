@@ -94,11 +94,12 @@ public class GameNetworkHandler {
     }
 
     /**
-     * The answer the client
-     *
+     * The answer from client
+     * Requests the answer from the client and returns it
      * @return String answer
      */
     public String getAnswer() {
+        receiveAnswer();
         return this.answer;
     }
 
